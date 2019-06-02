@@ -1,0 +1,19 @@
+- name: Update hostname
+  become: yes
+  hostname: name={{ inventory_hostname }}
+
+- name: Allow sudo without a password or TTY
+  become: yes
+  copy: dest=/etc/sudoers.d/sudo src=sudo mode=0440
+
+- name: Ensure `/etc/apt/apt.conf.d` is available
+  become: yes
+  file: path=/etc/apt/apt.conf.d state=directory
+
+- name: Install minimalist configuration for APT
+  become: yes
+  copy: dest=/etc/apt/apt.conf.d/99minimalist src=minimalist
+
+- name: Autoremove unnecessary packages
+  become: yes
+  apt: autoremove=yes

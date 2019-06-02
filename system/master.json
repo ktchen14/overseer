@@ -1,0 +1,67 @@
+{
+  "variables": {
+    "iso_checksum": "1150d1fe8d7186e5dbfa2e3c300e7866337ef26fd86eb35d53c96ec7f5eea38b",
+    "iso_checksum_type": "sha256",
+    "iso_url": "https://cdimage.debian.org/cdimage/buster_di_rc1/amd64/iso-cd/debian-buster-DI-rc1-amd64-netinst.iso",
+    "guest_os_type": "debian10-64",
+    "recipe": "overseer",
+    "username": "overseer",
+    "password": "overseer",
+    "disk_size": "20480"
+  },
+  "builders": [{
+    "type": "vmware-iso",
+    "iso_checksum": "{{ user `iso_checksum` }}",
+    "iso_checksum_type": "{{ user `iso_checksum_type` }}",
+    "iso_url": "{{ user `iso_url` }}",
+    "ssh_username": "{{ user `username` }}",
+    "ssh_password": "{{ user `password` }}",
+    "boot_command": [
+      "c<wait>",
+      "linux /install.amd/vmlinuz ",
+      "auto=true ",
+      "url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
+      "hostname=overseer ",
+      "domain= ",
+      "net.ifnames=0<return>",
+      "initrd /install.amd/initrd.gz<return>",
+      "boot<return>"
+    ],
+    "vmx_data": {
+      "firmware": "efi"
+    },
+    "disk_size": "{{ user `disk_size` }}",
+    "guest_os_type": "{{ user `guest_os_type` }}",
+    "headless": false,
+    "http_directory": "{{ template_dir }}/http",
+    "output_directory": "output/{{ user `recipe` }}-vmware",
+    "shutdown_command": "sudo /sbin/shutdown -h now",
+    "tools_upload_flavor": "linux",
+    "vm_name": "{{ user `recipe` }}",
+    "vmdk_name": "{{ user `recipe` }}"
+  }],
+  "provisioners": [{
+    "type": "shell",
+    "scripts": [
+      "{{ template_dir }}/script/vmware.sh",
+      "{{ template_dir }}/script/ansible.sh"
+    ],
+    "execute_command": "{{ .Vars }} sudo -E {{ .Path }}"
+  }, {
+    "type": "ansible",
+    "playbook_file": "site.yaml",
+    "extra_arguments": [
+      "-e", "ansible_python_interpreter=/usr/bin/python3"
+    ]
+  }, {
+    "type": "shell",
+    "script": "{{ template_dir }}/script/shrink.sh",
+    "execute_command": "{{ .Vars }} sudo -E {{ .Path }}"
+  }],
+  "post-processors": [{
+    "type": "compress",
+    "output": "output/{{ user `recipe` }}.vmware.tar.gz",
+    "compression_level": 9,
+    "keep_input_artifact": true
+  }]
+}

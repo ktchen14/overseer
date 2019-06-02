@@ -1,0 +1,10 @@
+# Ansible doesn't detect Debian Buster yet
+overseer ansible_distribution_release=buster
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
+
+[host]
+overseer
+
+# vim: set ft=ansible_hosts:

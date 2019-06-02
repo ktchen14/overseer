@@ -1,0 +1,2 @@
+Defaults:%sudo !requiretty
+%sudo ALL=(ALL) NOPASSWD: ALL
