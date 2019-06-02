@@ -2,3 +2,4 @@
   hosts: host
   roles:
   - system
+  - postgresql

@@ -1,0 +1,4 @@
+# The PostgreSQL version to use. Must be a version available for the target
+# Debian release in http://apt.postgresql.org/pub/repos/apt.
+
+postgresql_version: 11

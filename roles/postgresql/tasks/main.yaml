@@ -1,0 +1,46 @@
+- name: Add official PostgreSQL repository signing key
+  become: yes
+  apt_key: id=ACCC4CF8 url=https://www.postgresql.org/media/keys/ACCC4CF8.asc
+  register: apt_keyring
+
+- name: Add official PostgreSQL repository
+  become: yes
+  apt_repository: repo={{ postgresql_repo }}
+  register: apt_source_list
+
+- name: Update `apt` cache (if needed)
+  become: yes
+  apt: update_cache=yes
+  when: apt_keyring.changed or apt_source_list.changed
+
+- name: Install PostgreSQL
+  become: yes
+  apt: name=postgresql-{{ postgresql_version }}
+  register: postgresql_package
+  notify: Restart PostgreSQL service
+
+- name: Reload `systemd` configuration
+  become: yes
+  systemd: daemon_reload=yes
+  when: postgresql_package.changed
+
+- name: Enable and start PostgreSQL service
+  become: yes
+  systemd: name=postgresql enabled=yes state=started
+  register: postgresql_service
+
+- name: Install Psycopg2
+  become: yes
+  apt: name=python3-psycopg2
+
+- name: Add a PostgreSQL user for each person
+  become: yes
+  become_user: postgres
+  postgresql_user: name={{ item.username }} role_attr_flags=SUPERUSER
+  loop: "{{ people }}"
+
+- name: Add a PostgreSQL database for each person
+  become: yes
+  become_user: postgres
+  postgresql_db: name={{ item.username }} owner={{ item.username }}
+  loop: "{{ people }}"
