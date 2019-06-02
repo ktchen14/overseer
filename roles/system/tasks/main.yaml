@@ -18,6 +18,10 @@
   become: yes
   apt: autoremove=yes
 
+- name: Install neovim
+  become: yes
+  apt: name=neovim
+
 - name: Create a user account for each person
   become: yes
   user: name={{ item.username }}
