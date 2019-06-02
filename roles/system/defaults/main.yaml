@@ -1,0 +1,13 @@
+# List of people that should have a user account on the system in this format:
+#
+# people:
+# - username: ktchen14
+#   name: Kaiting Chen
+#   authorized_keys:
+#   - ...
+#
+# Each person in the list must have a `username` and `name` and will receive a
+# user account called `username` on the system. If available each key in
+# `authorized_keys` will be added to the user account's SSH authorized keys.
+
+people: []

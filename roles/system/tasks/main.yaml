@@ -17,3 +17,18 @@
 - name: Autoremove unnecessary packages
   become: yes
   apt: autoremove=yes
+
+- name: Create a user account for each person
+  become: yes
+  user: name={{ item.username }}
+  loop: "{{ people }}"
+
+- name: Enable `sudo` access for each person
+  become: yes
+  user: name={{ item.username }} append=yes groups=sudo
+  loop: "{{ people }}"
+
+- name: Add each person's list of authorized keys
+  become: yes
+  authorized_key: user={{ item.0.username }} key={{ item.1 }}
+  loop: "{{ people | subelements('authorized_keys', skip_missing=True) }}"
