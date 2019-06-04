@@ -3,4 +3,5 @@
   roles:
   - system
   - virtualization
+  - vision
   - postgresql

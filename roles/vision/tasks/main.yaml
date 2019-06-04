@@ -1,0 +1,27 @@
+- name: Copy vision udev rules
+  become: yes
+  copy:
+    dest: /etc/udev/rules.d/99-vision.rules
+    src: vision.rules
+
+- name: Create `/opt/vision` directory
+  become: yes
+  file: path=/opt/vision state=directory
+
+- name: Copy each vision script
+  become: yes
+  copy: dest=/opt/vision/{{ item }} src={{ item }}
+  loop:
+  - device_to_device_is
+  - dump_environment
+  - save_device
+
+- name: Copy `vision-device@.service` to systemd configuration
+  become: yes
+  copy: dest=/etc/systemd/system/vision-device@.service src=vision-device@.service
+  register: vision_device_unit_file
+
+- name: Reload `systemd` daemon
+  become: yes
+  systemd: daemon_reload=yes
+  when: vision_device_unit_file.changed

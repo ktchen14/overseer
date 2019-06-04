@@ -1,0 +1,28 @@
+#! /bin/bash
+
+usage() {
+  cat <<HELP
+Usage: $(printf %q "$(basename "$0")") DEVICE FILE [SUFFIX...]
+
+Test if DEVICE is equivalent to the text in FILE concatenated with any SUFFIX.
+DEVICE should be the kernel name of a device; FILE should hold the kernel name
+of a parent of DEVICE.
+HELP
+}
+
+for argument in "$@"; do case "$argument" in
+  -h|--help) usage; exit 0 ;;
+esac; done
+if [ $# -lt 3 ]; then usage 1>&2; exit 1; fi
+
+# Read the root device from the FILE
+if ! root="$(< "$2")"; then
+  echo "Unable to read file $2" 1>&2
+  exit 1
+fi
+
+# Exit with 0 if a suffix in the argument list concatenated to root is DEVICE
+for suffix in "${@:3}"; do
+  [ "$1" = "$root$suffix" ] && exit
+done
+exit 1

@@ -1,0 +1,12 @@
+[Unit]
+Description=Vision Device Manager Instance
+
+BindTo=%i.device
+After=%i.device
+
+[Service]
+Type=oneshot
+ExecStart=/bin/echo Start %f
+ExecStop=/bin/echo Stop %f
+ExecReload=/bin/echo reload %f
+RemainAfterExit=yes

@@ -1,0 +1,17 @@
+#! /bin/bash
+
+usage() {
+  cat <<HELP
+Usage: $(printf %q "$(basename "$0")") DEVICE FILE
+
+Echo DEVICE to FILE. DEVICE should be the kernel name of a device. This script
+is almost just \`mkdir -p \$(dirname FILE) && echo -n DEVICE > FILE\`.
+HELP
+}
+
+for argument in "$@"; do case "$argument" in
+  -h|--help) usage; exit 0 ;;
+esac; done
+if [ $# -ne 2 ]; then usage 1>&2; exit 1; fi
+
+mkdir -p "$(dirname "$2")" && printf %s "$1" > "$2"

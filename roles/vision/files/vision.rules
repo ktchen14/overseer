@@ -1,0 +1,83 @@
+# The vendor:product identifier of the USB 3.0 hub in each Dell U2718Q monitor
+# is 0424:2734 as in:
+#
+#   Bus ... Device ...: ID 0424:2734 Standard Microsystems Corp.
+#
+# An individual device of this type is impossible to distinguish in isolation as
+# all attributes amongst such devices are identical (no serial number is
+# available). Thus we have to distinguish each device using its port location on
+# its immediate parent (the switchable hub). From experience the port numbers on
+# the switchable hub are stable and align to its physical ports like:
+#
+#   --      ---      ---      ---      --
+#   | Port 1 | Port 2 | Port 3 | Port 4 |
+#   |===================================|
+#
+# The vendor:product identifier of the switchable USB 3.0 hub is 05e3:0610 as
+# in:
+#
+#   Bus ... Device ...: ID 05e3:0610 Genesys Logic, Inc. 4-port hub
+#
+# However the port number that a USB device is on isn't exposed as an attribute
+# in udev (or rather it isn't exposed in the uevent). Even if it was available
+# udev doesn't have any method to retrieve information from a device's immediate
+# parent. The only location that this information is available is in the kernel
+# name of the device itself (from http://www.linux-usb.org/FAQ.html#i6):
+#
+#   The (USB) devices are named by a scheme like this:
+#     bus-port.port.port ...
+#   The name starts with the bus number followed by a '-'. Then comes the
+#   sequence of port numbers for each of the intermediate hubs along the path to
+#   the device.
+#
+# So if the switchable hub's kernel name is 1-2 then the devices attached to it
+# have kernel names 1-2.1 through 1-2.4.
+#
+# To handle this situation when the switchable hub is added we save its kernel
+# name to a file `/run/vision/switch`. Then when a device accessible from the
+# switchable hub is added, to determine if it's directly attached to port `n` of
+# the switchable hub, we test if its kernel name is the switchable hub's kernel
+# name (from `/run/vision/switch`) concatenated with `.n`.
+
+# When the switchable hub is added to the system save its kernel name to
+# `/run/vision/switch`
+SUBSYSTEM=="usb", ACTION=="add", \
+  ATTR{idVendor}=="05e3", ATTR{idProduct}=="0610", \
+  RUN+="/opt/vision/save_device %k /run/vision/switch"
+
+# When the switchable hub is removed from the system delete `/run/vision/switch`
+SUBSYSTEM=="usb", ACTION=="remove", \
+  ENV{ID_VENDOR_ID}=="05e3", ENV{ID_MODEL_ID}=="0610", \
+  RUN+="/bin/rm -f /run/vision/switch"
+
+# Test if a Dell U2718Q USB 3.0 hub accessible from the switchable hub is
+# directly attached to port 1 on the switchable hub. If so then tag it in
+# systemd to create a device unit, create a symlink to it at
+# `/dev/vision/usbhub1`, and instantiate a `vision-device` systemd service to
+# manage it.
+SUBSYSTEM=="usb", \
+  ATTR{idVendor}=="0424", ATTR{idProduct}=="2734", \
+  ATTRS{idVendor}=="05e3", ATTRS{idProduct}=="0610", \
+  TEST=="/run/vision/switch" \
+  PROGRAM="/opt/vision/device_to_device_is %k /run/vision/switch .1", \
+  TAG+="systemd", \
+  ENV{SYSTEMD_WANTS}+="vision-device@.service", \
+  SYMLINK+="vision/usbhub1", GOTO="vision_usbhub_end"
+
+# Test if a Dell U2718Q USB 3.0 hub accessible from the switchable hub is
+# directly attached to port 4 on the switchable hub. If so then tag it in
+# systemd to create a device unit, create a symlink to it at
+# `/dev/vision/usbhub2`, and instantiate a `vision-device` systemd service to
+# manage it.
+SUBSYSTEM=="usb", \
+  ATTR{idVendor}=="0424", ATTR{idProduct}=="2734", \
+  ATTRS{idVendor}=="05e3", ATTRS{idProduct}=="0610", \
+  TEST=="/run/vision/switch" \
+  PROGRAM="/opt/vision/device_to_device_is %k /run/vision/switch .4", \
+  TAG+="systemd", \
+  ENV{SYSTEMD_WANTS}+="vision-device@.service", \
+  SYMLINK+="vision/usbhub2", GOTO="vision_usbhub_end"
+
+LABEL="vision_usbhub_end"
+
+# vim: set ft=udevrules:

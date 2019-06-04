@@ -1,0 +1,18 @@
+#! /bin/bash
+
+usage() {
+  cat <<HELP
+Usage: $(printf %q "$(basename "$0")") [FILE]
+
+Append the environment to FILE with \`env\`. If no FILE argument is given then
+append the environment to /tmp/environment.
+HELP
+}
+
+for argument in "$@"; do case "$argument" in
+  -h|--help) usage; exit 0 ;;
+esac; done
+if [ $# -gt 1 ]; then usage 1>&2; exit 1; fi
+
+file="${1:-/tmp/environment}"
+mkdir -p "$(dirname "$file")" && env >> "$file" && echo >> "$file"
