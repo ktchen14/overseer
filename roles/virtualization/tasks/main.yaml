@@ -1,3 +1,7 @@
 - name: Install QEMU-KVM
   become: yes
   apt: name=qemu-kvm
+
+- name: Copy `kvm.conf` to configure the `kvm` module
+  become: yes
+  copy: dest=/etc/modprobe.d/kvm.conf src=kvm.conf
