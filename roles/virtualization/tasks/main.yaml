@@ -19,3 +19,19 @@
       msg: Failed to reload `kvm` module on configuration change. Please reload the module manually or reboot the system.
     ignore_errors: yes
   when: kvm_conf.changed
+
+- name: Install libvirt daemon system
+  become: yes
+  apt: name=libvirt-daemon-system
+  register: libvirtd_package
+  notify: Restart libvirt daemon service
+
+- name: Reload `systemd` configuration
+  become: yes
+  systemd: daemon_reload=yes
+  when: libvirtd_package.changed
+
+- name: Enable and start libvirt daemon service
+  become: yes
+  systemd: name=libvirtd enabled=yes state=started
+  register: libvirtd_service

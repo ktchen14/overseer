@@ -1,0 +1,5 @@
+- name: Restart libvirt daemon service
+  become: yes
+  systemd: name=libvirtd state=restarted
+  register: libvirtd_service
+  when: not libvirtd_service.changed
