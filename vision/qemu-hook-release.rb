@@ -1,14 +1,7 @@
 #! /usr/bin/ruby
 
 require 'logger'
-
-logger = Logger.new(STDERR)
-
-logger.warn(<<~WARN) and exit unless ARGV.length == 4
-  Expected 4 arguments in invocation of hook #{$0} but received #{ARGV.length}
-WARN
-object, operation, suboperation, misc = ARGV
-exit unless operation == 'prepare' && suboperation == 'begin'
+require 'nokogiri'
 
 def on_prepare(device)
   if !driver_name.nil? && driver_name != 'vfio-pci'
@@ -44,8 +37,6 @@ end
 
 def on_release(device)
 end
-
-require 'nokogiri'
 
 document = Nokogiri::XML(STDIN) { |c| c.strict.noblanks }
 

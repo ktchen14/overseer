@@ -1,50 +1,6 @@
 #! /usr/bin/ruby
 
 require 'logger'
-
-logger = Logger.new(STDERR)
-
-logger.warn(<<~WARN) and exit unless ARGV.length == 4
-  Expected 4 arguments in invocation of hook #{$0} but received #{ARGV.length}
-WARN
-object, operation, suboperation, misc = ARGV
-exit unless operation == 'prepare' && suboperation == 'begin'
-
-def on_prepare(device)
-  if !driver_name.nil? && driver_name != 'vfio-pci'
-    fail <<~FAIL unless File.directory?(driver_path)
-      Expected device driver at #{driver_path} to be a directory
-    FAIL
-
-    File.write(File.join(driver_path, 'unbind'), device)
-    sleep(0.1)
-
-    fail <<~FAIL if File.directory?(driver_path)
-      Unable to unbind driver #{driver_name.inspect} from device #{device}
-    FAIL
-  end
-
-  File.write(File.join(device_path, 'driver_override'), 'vfio-pci')
-  File.write('/sys/bus/pci/drivers_probe', device)
-  sleep(0.1)
-
-  fail <<~FAIL unless File.directory?(driver_path)
-    Unable to reassociate device #{device} with driver "vfio-pci"
-  FAIL
-
-  fail <<~FAIL unless File.symlink?(driver_path)
-    Driver of device #{device} isn't a symlink
-  FAIL
-
-  driver_name = File.basename(File.readlink(driver_path))
-  fail <<~FAIL if driver_name != 'vfio-pci'
-    Expected device #{device}'s driver #{driver_name.inspect} to be "vfio-pci"
-  FAIL
-end
-
-def on_release(device)
-end
-
 require 'nokogiri'
 
 document = Nokogiri::XML(STDIN) { |c| c.strict.noblanks }

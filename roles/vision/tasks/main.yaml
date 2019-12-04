@@ -25,3 +25,11 @@
   become: yes
   systemd: daemon_reload=yes
   when: vision_device_unit_file.changed
+
+- name: Create `/etc/libvirt/hooks` directory
+  become: yes
+  file: path=/etc/libvirt/hooks state=directory
+
+- name: Copy `libvirt` QEMU hook
+  become: yes
+  copy: dest=/etc/libvirt/hooks/qemu src=qemu-hook.rb
