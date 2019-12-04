@@ -1,9 +1,9 @@
 {
   "variables": {
-    "iso_checksum": "e43fef979352df15056ac512ad96a07b515cb8789bf0bfd86f99ed0404f885f5",
+    "iso_checksum": "921fd8b271c04aa86a321cc35b40e677f9b85f7903bf2204efb2389b0f0a64c1",
     "iso_checksum_type": "sha256",
-    "iso_url": "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-10.2.0-amd64-netinst.iso",
-    "guest_os_type": "debian10-64",
+    "iso_url": "http://cdimage.ubuntu.com/releases/19.10/release/ubuntu-19.10-server-amd64.iso",
+    "guest_os_type": "ubuntu-64",
     "username": "overseer",
     "password": "overseer"
   },
@@ -16,29 +16,30 @@
     "ssh_password": "{{ user `password` }}",
     "ssh_timeout": "20m",
     "boot_command": [
-      "c<wait>",
-      "linux /install.amd/vmlinuz ",
+      "<esc><wait>",
+      "linux /install/vmlinuz ",
       "auto=true ",
       "url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
-      "hostname=overseer ",
+      "hostname=ubuntu-vm ",
       "domain= ",
       "net.ifnames=0<return>",
-      "initrd /install.amd/initrd.gz<return>",
+      "initrd /install/initrd.gz<return>",
       "boot<return>"
     ],
     "vmx_data": {
       "firmware": "efi"
     },
-    "disk_size": "20480",
-    "memory": "2048",
+    "disk_size": 8192,
+    "disk_type_id": "0",
+    "memory": 2048,
     "guest_os_type": "{{ user `guest_os_type` }}",
     "headless": false,
     "http_directory": "{{ template_dir }}/http",
-    "output_directory": "output/overseer-vmware",
+    "output_directory": "vmware",
     "shutdown_command": "sudo /sbin/shutdown -h now",
     "tools_upload_flavor": "linux",
-    "vm_name": "overseer",
-    "vmdk_name": "overseer"
+    "vm_name": "ubuntu",
+    "vmdk_name": "ubuntu"
   }],
   "provisioners": [{
     "type": "shell",
@@ -57,11 +58,5 @@
     "type": "shell",
     "script": "{{ template_dir }}/script/shrink.sh",
     "execute_command": "{{ .Vars }} sudo -E {{ .Path }}"
-  }],
-  "post-processors": [{
-    "type": "compress",
-    "output": "output/overseer.vmware.tar.gz",
-    "compression_level": 9,
-    "keep_input_artifact": true
   }]
 }
