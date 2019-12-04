@@ -1,0 +1,26 @@
+GPU_1 = device '/sys/devices/pci0000:00/0000:00:03.1/0000:2e:00.0'
+GPU_AUDIO_1 = device '/sys/devices/pci0000:00/0000:00:03.1/0000:2e:00.1'
+
+GPU_2 = device '/sys/devices/pci0000:00/0000:00:03.1/0000:2f:00.0'
+GPU_AUDIO_2 = device '/sys/devices/pci0000:00/0000:00:03.1/0000:2f:00.1'
+
+SWITCH_PORT = [
+  device '/dev/vision/switch_port_1',
+  device '/dev/vision/switch_port_2',
+  device '/dev/vision/switch_port_3',
+  device '/dev/vision/switch_port_4',
+]
+
+view :DualScreen do
+  attach(GPU_1, GPU_AUDIO_1, GPU_2, GPU_AUDIO_2, *SWITCH_PORT)
+end
+
+view :Screen1 do
+  attach GPU_1, GPU_AUDIO_1, SWITCH_PORT[0]
+end
+
+view :Screen2 do
+  attach GPU_2, GPU_AUDIO_2, SWITCH_PORT[3]
+end
+
+# vim: set ft=ruby:

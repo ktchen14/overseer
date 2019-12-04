@@ -1,0 +1,29 @@
+#! /bin/bash
+
+usage() {
+  cat <<HELP
+Usage: $(printf %q "$(basename "$0")") VM DEVICE
+HELP
+}
+
+for argument in "$@"; do case "$argument" in
+  -h|--help) usage; exit 0 ;;
+esac; done
+if [ $# -ne 2 ]; then usage 1>&2; exit 1; fi
+
+if ! subsystem="$(basename "$(readlink -f "$2/subsystem")")"; then
+  echo "Can't determine subsystem of device at $2" 1>&2
+  exit 1
+fi
+
+if [ "$subsystem" = usb ]; then
+  if ! busnum="$(< "$2/busnum")"; then
+    echo "Can't determine bus number of device at $2" 1>&2
+    exit 1
+  fi
+
+  if ! devnum="$(< "$2/devnum")"; then
+    echo "Can't determine device number of device at $2" 1>&2
+    exit 1
+  fi
+fi
