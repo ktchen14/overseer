@@ -33,3 +33,22 @@
 - name: Copy `libvirt` QEMU hook
   become: yes
   copy: dest=/etc/libvirt/hooks/qemu src=qemu-hook.rb
+
+- name: Enable IOMMU in Linux command line
+  become: yes
+  lineinfile:
+    path: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT='
+    insertbefore: '^GRUB_CMDLINE_LINUX='
+    line: 'GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on"'
+  register: grub_configuration_file
+
+- name: Update GRUB configuration
+  become: yes
+  command: update-grub
+  when: grub_configuration_file.changed
+
+- name: Reboot system
+  become: yes
+  reboot:
+  when: grub_configuration_file.changed
