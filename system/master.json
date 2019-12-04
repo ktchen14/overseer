@@ -57,11 +57,5 @@
     "type": "shell",
     "script": "{{ template_dir }}/script/shrink.sh",
     "execute_command": "{{ .Vars }} sudo -E {{ .Path }}"
-  }],
-  "post-processors": [{
-    "type": "compress",
-    "output": "output/overseer.vmware.tar.gz",
-    "compression_level": 9,
-    "keep_input_artifact": true
   }]
 }
