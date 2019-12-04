@@ -29,6 +29,7 @@
       "firmware": "efi"
     },
     "disk_size": "20480",
+    "memory": "2048",
     "guest_os_type": "{{ user `guest_os_type` }}",
     "headless": false,
     "http_directory": "{{ template_dir }}/http",
