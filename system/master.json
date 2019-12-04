@@ -4,10 +4,8 @@
     "iso_checksum_type": "sha256",
     "iso_url": "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-10.2.0-amd64-netinst.iso",
     "guest_os_type": "debian10-64",
-    "recipe": "overseer",
     "username": "overseer",
-    "password": "overseer",
-    "disk_size": "20480"
+    "password": "overseer"
   },
   "builders": [{
     "type": "vmware-iso",
@@ -30,15 +28,15 @@
     "vmx_data": {
       "firmware": "efi"
     },
-    "disk_size": "{{ user `disk_size` }}",
+    "disk_size": "20480",
     "guest_os_type": "{{ user `guest_os_type` }}",
     "headless": false,
     "http_directory": "{{ template_dir }}/http",
-    "output_directory": "output/{{ user `recipe` }}-vmware",
+    "output_directory": "output/overseer-vmware",
     "shutdown_command": "sudo /sbin/shutdown -h now",
     "tools_upload_flavor": "linux",
-    "vm_name": "{{ user `recipe` }}",
-    "vmdk_name": "{{ user `recipe` }}"
+    "vm_name": "overseer",
+    "vmdk_name": "overseer"
   }],
   "provisioners": [{
     "type": "shell",
@@ -60,7 +58,7 @@
   }],
   "post-processors": [{
     "type": "compress",
-    "output": "output/{{ user `recipe` }}.vmware.tar.gz",
+    "output": "output/overseer.vmware.tar.gz",
     "compression_level": 9,
     "keep_input_artifact": true
   }]
