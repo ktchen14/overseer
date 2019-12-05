@@ -2,6 +2,14 @@
   become: yes
   apt: name=qemu-kvm
 
+- name: Install virtualization utilities
+  become: yes
+  apt:
+    name:
+    - libosinfo-bin # osinfo-query
+    - ovmf          # UEFI
+    - qemu-utils    # qemu-img
+
 - name: Copy `kvm` module configuration
   become: yes
   copy: dest=/etc/modprobe.d/kvm.conf src=kvm.conf

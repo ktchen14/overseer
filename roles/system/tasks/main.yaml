@@ -22,6 +22,14 @@
   become: yes
   apt: name=neovim
 
+- name: Install Git
+  become: yes
+  apt: name=git
+
+- name: Install make
+  become: yes
+  apt: name=make
+
 - name: Create a user account for each person
   become: yes
   user: name={{ item.username }}
