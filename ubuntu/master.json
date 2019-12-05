@@ -58,5 +58,12 @@
     "type": "shell",
     "script": "{{ template_dir }}/script/shrink.sh",
     "execute_command": "{{ .Vars }} sudo -E {{ .Path }}"
+  }],
+  "post-processors": [{
+    "type": "shell-local",
+    "inline": [
+      "qemu-img convert vmware/ubuntu.vmdk ubuntu.qcow2",
+      "exit 0"
+    ]
   }]
 }
