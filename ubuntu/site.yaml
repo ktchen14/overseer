@@ -1,3 +1,13 @@
 - hosts: all
   become: yes
-  tasks: []
+  tasks:
+  - name: Enable Linux boot output in GRUB
+    lineinfile:
+      path: /etc/default/grub
+      regexp: '^GRUB_CMDLINE_LINUX_DEFAULT='
+      insertbefore: '^GRUB_CMDLINE_LINUX='
+      line: 'GRUB_CMDLINE_LINUX_DEFAULT=""'
+    register: grub_configuration_file
+  - name: Update GRUB configuration
+    command: update-grub
+    when: grub_configuration_file.changed
