@@ -13,6 +13,7 @@
 #include <libudev.h>
 #include <libvirt/libvirt.h>
 #include <libxml/xpath.h>
+#include <systemd/sd-daemon.h>
 
 #include "device.h"
 #include "status.h"
@@ -67,6 +68,9 @@ int main(int argc __attribute__((unused)), char *argv[] __attribute__((unused)))
     initialize_domain(domain, VIR_DOMAIN_AFFECT_CONFIG);
   }
 
+  // Notify systemd that the vision daemon is initialized
+  sd_notify(0, "READY=1\n");
+
   /* for (size_t i = 0; i < domain_list_length; i++) */
   /*   virDomainFree(domain_list[i]); */
   /* free(domain_list); */
@@ -115,9 +119,11 @@ int main(int argc __attribute__((unused)), char *argv[] __attribute__((unused)))
   skip:
     udev_device_unref(actual);
   }
-except_poll:
 
+except_poll:
   // Shutdown
+
+  sd_notify(0, "STOPPING=1\n");
 
   virConnectClose(virt);
   udev_monitor_unref(monitor);
