@@ -4,6 +4,7 @@
 
 static vs_device_t GPU_VIDEO_1 = {
   .name = "GPU_VIDEO_1", .view_list = { "DualScreen", "Screen1", NULL },
+  .xtra = "<rom file=\"/home/ktchen14/rom\" />",
 };
 
 static vs_device_t GPU_AUDIO_1 = {
@@ -12,6 +13,7 @@ static vs_device_t GPU_AUDIO_1 = {
 
 static vs_device_t GPU_VIDEO_2 = {
   .name = "GPU_VIDEO_2", .view_list = { "DualScreen", "Screen2", NULL },
+  .xtra = "<rom file=\"/home/ktchen14/rom\" />",
 };
 
 static vs_device_t GPU_AUDIO_2 = {
