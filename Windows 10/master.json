@@ -1,0 +1,41 @@
+{
+  "variables": {
+    "iso_checksum": "01bf1eb643f7e50d0438f4f74fb91468d35cde2c82b07abc1390d47fc6a356be",
+    "iso_checksum_type": "sha256",
+    "iso_url": "{{ template_dir }}/Windows 10 x64 (1909).iso",
+    "guest_os_type": "windows9-64",
+    "username": "overseer",
+    "password": "overseer"
+  },
+  "builders": [{
+    "type": "vmware-iso",
+    "iso_checksum": "{{ user `iso_checksum` }}",
+    "iso_checksum_type": "{{ user `iso_checksum_type` }}",
+    "iso_url": "{{ user `iso_url` }}",
+    "communicator": "winrm",
+    "winrm_username": "{{ user `username` }}",
+    "winrm_password": "{{ user `password` }}",
+    "boot_wait": "0.1s",
+    "boot_command": [
+      "<return><wait><return><wait><return><wait><return>"
+    ],
+    "floppy_files": [
+      "{{ template_dir }}/Autounattend.xml",
+      "{{ template_dir }}/script/Enable-WinRM.ps1"
+    ],
+    "vmx_data": {
+      "firmware": "efi",
+      "scsi0.virtualDev": "lsisas1068"
+    },
+    "disk_size": 61440,
+    "disk_type_id": "0",
+    "memory": 2048,
+    "version": "14",
+    "guest_os_type": "{{ user `guest_os_type` }}",
+    "headless": false,
+    "output_directory": "vmware",
+    "shutdown_command": "shutdown /s /t 20 /d p:4:1 /c \"Packer Shutdown\"",
+    "vm_name": "Windows 10",
+    "vmdk_name": "Windows 10"
+  }]
+}
