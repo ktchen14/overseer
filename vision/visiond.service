@@ -1,0 +1,12 @@
+[Unit]
+Description=Vision Daemon
+
+BindTo=libvirtd.service
+After=libvirtd.device
+
+Requires=systemd-udevd.service
+After=systemd-udevd.device
+
+[Service]
+Type=notify
+ExecStart=/usr/local/bin/visiond
