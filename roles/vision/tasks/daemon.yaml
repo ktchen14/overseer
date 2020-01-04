@@ -1,0 +1,59 @@
+- name: Install vision daemon compilation dependencies
+  become: yes
+  apt:
+    name:
+    - build-essential
+    - cmake
+    - libsystemd-dev
+    - libudev-dev
+    - libvirt-dev
+    - libxml2-dev
+    - pkg-config
+    - rsync
+
+- name: Synchronize vision daemon code
+  synchronize:
+    src: "{{ inventory_dir }}/vision/"
+    dest: vision
+    # To ensure that no change is detected when the code itself hasn't changed
+    # we need archive=no, times=yes, and --omit-dir-times.
+    archive: no
+    links: yes
+    recursive: yes
+    times: yes
+    rsync_opts: --omit-dir-times
+  register: vision_code
+
+- name: Generate Makefile from CMake
+  command: cmake .
+  args:
+    chdir: vision
+  when: vision_code.changed
+
+- name: Compile vision daemon
+  make: chdir=vision
+  when: vision_code.changed
+
+- name: Install vision daemon
+  become: yes
+  command: make install
+  args:
+    chdir: vision
+  when: vision_code.changed
+
+- name: Install vision daemon unit file
+  become: yes
+  copy:
+    dest: /etc/systemd/system/visiond.service
+    src: visiond.service
+  register: visiond_unit_file
+
+- name: Reload `systemd` configuration
+  become: yes
+  systemd: daemon_reload=yes
+  when: visiond_unit_file.changed
+
+- name: Enable the vision daemon service
+  become: yes
+  systemd: name=visiond enabled=yes state=started
+  register: visiond_service
