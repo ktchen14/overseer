@@ -10,3 +10,6 @@ After=systemd-udevd.device
 [Service]
 Type=notify
 ExecStart=/usr/local/bin/visiond
+
+[Install]
+WantedBy=multi-user.target

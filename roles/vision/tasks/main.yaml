@@ -1,40 +1,4 @@
-- name: Copy vision udev rules
-  become: yes
-  copy:
-    dest: /etc/udev/rules.d/99-vision.rules
-    src: udev/vision.rules
-
-- name: Create `/opt/vision` directory
-  become: yes
-  file: path=/opt/vision state=directory
-
-- name: Copy each vision script
-  become: yes
-  copy: dest=/opt/vision/{{ item | basename }} src={{ item }}
-  loop:
-  - script/device_to_device_is
-  - script/dump_environment
-  - script/save_device
-
-- name: Copy `vision-device@.service` to systemd configuration
-  become: yes
-  copy:
-    dest: /etc/systemd/system/vision-device@.service
-    src: systemd/vision-device@.service
-  register: vision_device_unit_file
-
-- name: Reload `systemd` daemon
-  become: yes
-  systemd: daemon_reload=yes
-  when: vision_device_unit_file.changed
-
-- name: Create `/etc/libvirt/hooks` directory
-  become: yes
-  file: path=/etc/libvirt/hooks state=directory
-
-- name: Copy `libvirt` QEMU hook
-  become: yes
-  copy: dest=/etc/libvirt/hooks/qemu src=script/qemu-hook.rb
+- import_tasks: daemon.yaml
 
 - name: Enable IOMMU in Linux command line
   become: yes
@@ -54,3 +18,21 @@
   become: yes
   reboot:
   when: grub_configuration_file.changed
+
+- name: Copy vision udev rules
+  become: yes
+  copy:
+    dest: /etc/udev/rules.d/99-vision.rules
+    src: udev/vision.rules
+
+- name: Create `/opt/vision` directory
+  become: yes
+  file: path=/opt/vision state=directory
+
+- name: Copy each vision script
+  become: yes
+  copy: dest=/opt/vision/{{ item | basename }} src={{ item }}
+  loop:
+  - script/device_to_device_is
+  - script/dump_environment
+  - script/save_device
