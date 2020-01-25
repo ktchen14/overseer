@@ -15,5 +15,5 @@
 - name: Autostart the vision storage pool
   virt_pool: name={{ vision_pool_name }} autostart=yes
 
-- name: Autostart the vision storage pool
+- name: Activate the vision storage pool
   virt_pool: name={{ vision_pool_name }} state=active
