@@ -43,65 +43,185 @@
 # `/run/vision/switch`
 SUBSYSTEM=="usb", ACTION=="add", \
   ATTR{idVendor}=="05e3", ATTR{idProduct}=="0610", \
-  RUN+="/opt/vision/save_device %k /run/vision/switch"
+  RUN+="/opt/vision/save_device %k /run/vision/switch", \
+  GOTO="vision_end"
 
 # When the switchable hub is removed from the system delete `/run/vision/switch`
 SUBSYSTEM=="usb", ACTION=="remove", \
   ENV{ID_VENDOR_ID}=="05e3", ENV{ID_MODEL_ID}=="0610", \
-  RUN+="/bin/rm -f /run/vision/switch"
+  RUN+="/bin/rm -f /run/vision/switch", \
+  GOTO="vision_end"
 
 # Test if a Dell U2718Q USB 3.0 hub accessible from the switchable hub is
-# directly attached to port 1 on the switchable hub. If so then tag it in
-# systemd to create a device unit, create a symlink to it at
-# `/dev/vision/usbhub1`, and instantiate a `vision-device` systemd service to
-# manage it.
-SUBSYSTEM=="usb", \
+# directly attached to port 1 on the switchable hub. If so then create a symlink
+# to it at `/dev/vision/usbhub1` and save its kernel name to
+# `/run/vision/usbhub1`.
+SUBSYSTEM=="usb", ACTION=="add", \
   ATTR{idVendor}=="0424", ATTR{idProduct}=="2734", \
   ATTRS{idVendor}=="05e3", ATTRS{idProduct}=="0610", \
-  TEST=="/run/vision/switch" \
+  TEST=="/run/vision/switch", \
   PROGRAM="/opt/vision/device_to_device_is %k /run/vision/switch .1", \
-  TAG+="systemd", \
-  ENV{SYSTEMD_WANTS}+="vision-device@.service", \
-  SYMLINK+="vision/usbhub1", GOTO="vision_usbhub_end"
+  SYMLINK+="vision/usbhub1", \
+  RUN+="/opt/vision/save_device %k /run/vision/usbhub1", \
+  GOTO="vision_end"
+
+SUBSYSTEM=="usb", ACTION=="remove", \
+  ENV{ID_VENDOR_ID}=="0424", ENV{ID_MODEL_ID}=="2734", \
+  TEST=="/run/vision/switch", \
+  PROGRAM="/opt/vision/device_to_device_is %k /run/vision/switch .1", \
+  RUN+="/bin/rm -f /run/vision/usbhub1", \
+  GOTO="vision_end"
 
 # Test if a Dell U2718Q USB 3.0 hub accessible from the switchable hub is
-# directly attached to port 4 on the switchable hub. If so then tag it in
-# systemd to create a device unit, create a symlink to it at
-# `/dev/vision/usbhub2`, and instantiate a `vision-device` systemd service to
-# manage it.
-SUBSYSTEM=="usb", \
+# directly attached to port 4 on the switchable hub. If so then create a symlink
+# to it at `/dev/vision/usbhub2` and save its kernel name to
+# `/run/vision/usbhub2`.
+SUBSYSTEM=="usb", ACTION=="add", \
   ATTR{idVendor}=="0424", ATTR{idProduct}=="2734", \
   ATTRS{idVendor}=="05e3", ATTRS{idProduct}=="0610", \
-  TEST=="/run/vision/switch" \
+  TEST=="/run/vision/switch", \
   PROGRAM="/opt/vision/device_to_device_is %k /run/vision/switch .4", \
-  TAG+="systemd", \
-  ENV{SYSTEMD_WANTS}+="vision-device@.service", \
-  SYMLINK+="vision/usbhub2", GOTO="vision_usbhub_end"
+  SYMLINK+="vision/usbhub2", \
+  RUN+="/opt/vision/save_device %k /run/vision/usbhub2", \
+  GOTO="vision_end"
+
+SUBSYSTEM=="usb", ACTION=="remove", \
+  ENV{ID_VENDOR_ID}=="0424", ENV{ID_MODEL_ID}=="2734", \
+  TEST=="/run/vision/switch", \
+  PROGRAM="/opt/vision/device_to_device_is %k /run/vision/switch .4", \
+  RUN+="/bin/rm -f /run/vision/usbhub2", \
+  GOTO="vision_end"
 
 # Bind the video function on GPU 1 (specified by its PCI slot name) to the
 # GPU1_VIDEO vision device. This should be stable absent a hardware change as
 # GPU 1 is physically attached to domain 0000, bus 2e, slot 00.
-SUBSYSTEM=="pci", ENV{PCI_SLOT_NAME}=="0000:2e:00.0", \
-  TAG+="vision", ENV{VISION_NAME}="GPU1_VIDEO"
+SUBSYSTEM=="pci", \
+  ENV{PCI_SLOT_NAME}=="0000:2e:00.0", \
+  TAG+="vision", \
+  ENV{VISION_NAME}="GPU1_VIDEO", \
+  GOTO="vision_end"
 
 # Bind the audio function on GPU 1 (specified by its PCI slot name) to the
 # GPU1_AUDIO vision device. This should be stable absent a hardware change as
 # GPU 1 is physically attached to domain 0000, bus 2e, slot 00.
-SUBSYSTEM=="pci", ENV{PCI_SLOT_NAME}=="0000:2e:00.1", \
-  TAG+="vision", ENV{VISION_NAME}="GPU1_AUDIO"
+SUBSYSTEM=="pci", \
+  ENV{PCI_SLOT_NAME}=="0000:2e:00.1", \
+  TAG+="vision", \
+  ENV{VISION_NAME}="GPU1_AUDIO", \
+  GOTO="vision_end"
 
 # Bind the video function on GPU 2 (specified by its PCI slot name) to the
 # GPU2_VIDEO vision device. This should be stable absent a hardware change as
 # GPU 2 is physically attached to domain 0000, bus 2f, slot 00.
-SUBSYSTEM=="pci", ENV{PCI_SLOT_NAME}=="0000:2f:00.0", \
-  TAG+="vision", ENV{VISION_NAME}="GPU2_VIDEO"
+SUBSYSTEM=="pci", \
+  ENV{PCI_SLOT_NAME}=="0000:2f:00.0", \
+  TAG+="vision", \
+  ENV{VISION_NAME}="GPU2_VIDEO", \
+  GOTO="vision_end"
 
 # Bind the audio function on GPU 2 (specified by its PCI slot name) to the
 # GPU2_AUDIO vision device. This should be stable absent a hardware change as
 # GPU 2 is physically attached to domain 0000, bus 2f, slot 00.
-SUBSYSTEM=="pci", ENV{PCI_SLOT_NAME}=="0000:2f:00.1", \
-  TAG+="vision", ENV{VISION_NAME}="GPU2_AUDIO"
+SUBSYSTEM=="pci", \
+  ENV{PCI_SLOT_NAME}=="0000:2f:00.1", \
+  TAG+="vision", \
+  ENV{VISION_NAME}="GPU2_AUDIO", \
+  GOTO="vision_end"
 
-LABEL="vision_usbhub_end"
+
+
+SUBSYSTEM=="usb", \
+  ATTRS{idVendor}=="0424", ATTRS{idProduct}=="2734", \
+  TEST=="/run/vision/usbhub1", \
+  PROGRAM="/opt/vision/device_to_device_is %k /run/vision/usbhub1 .1", \
+  SYMLINK+="vision/usbhub1.1", \
+  TAG+="vision", \
+  ENV{VISION_NAME}="USBHUB1_1", \
+  GOTO="vision_end"
+
+SUBSYSTEM=="usb", \
+  ATTRS{idVendor}=="0424", ATTRS{idProduct}=="2734", \
+  TEST=="/run/vision/usbhub1", \
+  PROGRAM="/opt/vision/device_to_device_is %k /run/vision/usbhub1 .2", \
+  SYMLINK+="vision/usbhub1.2", \
+  TAG+="vision", \
+  ENV{VISION_NAME}="USBHUB1_2", \
+  GOTO="vision_end"
+
+SUBSYSTEM=="usb", \
+  ATTRS{idVendor}=="0424", ATTRS{idProduct}=="2734", \
+  TEST=="/run/vision/usbhub1", \
+  PROGRAM="/opt/vision/device_to_device_is %k /run/vision/usbhub1 .3", \
+  SYMLINK+="vision/usbhub1.3", \
+  TAG+="vision", \
+  ENV{VISION_NAME}="USBHUB1_3", \
+  GOTO="vision_end"
+
+SUBSYSTEM=="usb", \
+  ATTRS{idVendor}=="0424", ATTRS{idProduct}=="2734", \
+  TEST=="/run/vision/usbhub1", \
+  PROGRAM="/opt/vision/device_to_device_is %k /run/vision/usbhub1 .4", \
+  SYMLINK+="vision/usbhub1.4", \
+  TAG+="vision", \
+  ENV{VISION_NAME}="USBHUB1_4", \
+  GOTO="vision_end"
+
+SUBSYSTEM=="usb", \
+  ATTRS{idVendor}=="0424", ATTRS{idProduct}=="2734", \
+  TEST=="/run/vision/usbhub1", \
+  PROGRAM="/opt/vision/device_to_device_is %k /run/vision/usbhub1 .5", \
+  SYMLINK+="vision/usbhub1.5", \
+  TAG+="vision", \
+  ENV{VISION_NAME}="USBHUB1_5", \
+  GOTO="vision_end"
+
+
+SUBSYSTEM=="usb", \
+  ATTRS{idVendor}=="0424", ATTRS{idProduct}=="2734", \
+  TEST=="/run/vision/usbhub2", \
+  PROGRAM="/opt/vision/device_to_device_is %k /run/vision/usbhub2 .1", \
+  SYMLINK+="vision/usbhub2.1", \
+  TAG+="vision", \
+  ENV{VISION_NAME}="USBHUB2_1", \
+  GOTO="vision_end"
+
+SUBSYSTEM=="usb", \
+  ATTRS{idVendor}=="0424", ATTRS{idProduct}=="2734", \
+  TEST=="/run/vision/usbhub2", \
+  PROGRAM="/opt/vision/device_to_device_is %k /run/vision/usbhub2 .2", \
+  SYMLINK+="vision/usbhub2.2", \
+  TAG+="vision", \
+  ENV{VISION_NAME}="USBHUB2_2", \
+  GOTO="vision_end"
+
+SUBSYSTEM=="usb", \
+  ATTRS{idVendor}=="0424", ATTRS{idProduct}=="2734", \
+  TEST=="/run/vision/usbhub2", \
+  PROGRAM="/opt/vision/device_to_device_is %k /run/vision/usbhub2 .3", \
+  SYMLINK+="vision/usbhub2.3", \
+  TAG+="vision", \
+  ENV{VISION_NAME}="USBHUB2_3", \
+  GOTO="vision_end"
+
+SUBSYSTEM=="usb", \
+  ATTRS{idVendor}=="0424", ATTRS{idProduct}=="2734", \
+  TEST=="/run/vision/usbhub2", \
+  PROGRAM="/opt/vision/device_to_device_is %k /run/vision/usbhub2 .4", \
+  SYMLINK+="vision/usbhub2.4", \
+  TAG+="vision", \
+  ENV{VISION_NAME}="USBHUB2_4", \
+  GOTO="vision_end"
+
+SUBSYSTEM=="usb", \
+  ATTRS{idVendor}=="0424", ATTRS{idProduct}=="2734", \
+  TEST=="/run/vision/usbhub2", \
+  PROGRAM="/opt/vision/device_to_device_is %k /run/vision/usbhub2 .5", \
+  SYMLINK+="vision/usbhub2.5", \
+  TAG+="vision", \
+  ENV{VISION_NAME}="USBHUB2_5", \
+  GOTO="vision_end"
+
+
+LABEL="vision_end"
 
 # vim: set ft=udevrules:
