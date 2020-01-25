@@ -44,3 +44,18 @@
   become: yes
   systemd: name=libvirtd enabled=yes state=started
   register: libvirtd_service
+
+- name: Install dnsmasq
+  become: yes
+  apt: name=dnsmasq
+
+- name: Install requirements of the `virt_net` module
+  become: yes
+  apt:
+    name: [python3-libvirt, python3-lxml]
+
+- name: Autostart the default libvirt network
+  virt_net: name=default autostart=yes
+
+- name: Activate the default libvirt network
+  virt_net: name=default state=active
