@@ -78,6 +78,30 @@ SUBSYSTEM=="usb", \
   ENV{SYSTEMD_WANTS}+="vision-device@.service", \
   SYMLINK+="vision/usbhub2", GOTO="vision_usbhub_end"
 
+# Bind the video function on GPU 1 (specified by its PCI slot name) to the
+# GPU1_VIDEO vision device. This should be stable absent a hardware change as
+# GPU 1 is physically attached to domain 0000, bus 2e, slot 00.
+SUBSYSTEM=="pci", ENV{PCI_SLOT_NAME}=="0000:2e:00.0", \
+  TAG+="vision", ENV{VISION_NAME}="GPU1_VIDEO"
+
+# Bind the audio function on GPU 1 (specified by its PCI slot name) to the
+# GPU1_AUDIO vision device. This should be stable absent a hardware change as
+# GPU 1 is physically attached to domain 0000, bus 2e, slot 00.
+SUBSYSTEM=="pci", ENV{PCI_SLOT_NAME}=="0000:2e:00.1", \
+  TAG+="vision", ENV{VISION_NAME}="GPU1_AUDIO"
+
+# Bind the video function on GPU 2 (specified by its PCI slot name) to the
+# GPU2_VIDEO vision device. This should be stable absent a hardware change as
+# GPU 2 is physically attached to domain 0000, bus 2f, slot 00.
+SUBSYSTEM=="pci", ENV{PCI_SLOT_NAME}=="0000:2f:00.0", \
+  TAG+="vision", ENV{VISION_NAME}="GPU2_VIDEO"
+
+# Bind the audio function on GPU 2 (specified by its PCI slot name) to the
+# GPU2_AUDIO vision device. This should be stable absent a hardware change as
+# GPU 2 is physically attached to domain 0000, bus 2f, slot 00.
+SUBSYSTEM=="pci", ENV{PCI_SLOT_NAME}=="0000:2f:00.1", \
+  TAG+="vision", ENV{VISION_NAME}="GPU2_AUDIO"
+
 LABEL="vision_usbhub_end"
 
 # vim: set ft=udevrules:
