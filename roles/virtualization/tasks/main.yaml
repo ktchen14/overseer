@@ -9,6 +9,7 @@
     - libosinfo-bin # osinfo-query
     - ovmf          # UEFI
     - qemu-utils    # qemu-img
+    - virtinst      # virt-install
 
 - name: Copy `kvm` module configuration
   become: yes
