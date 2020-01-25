@@ -1,0 +1,19 @@
+- name: Install requirements of the `virt_pool` module
+  become: yes
+  apt:
+    name: [python3-libvirt, python3-lxml]
+
+- name: Define the vision storage pool
+  virt_pool:
+    name: "{{ vision_pool_name }}"
+    state: present
+    xml: |
+      <pool type="logical">
+        <name>{{ vision_pool_name | escape }}</name>
+      </pool>
+
+- name: Autostart the vision storage pool
+  virt_pool: name={{ vision_pool_name }} autostart=yes
+
+- name: Autostart the vision storage pool
+  virt_pool: name={{ vision_pool_name }} state=active

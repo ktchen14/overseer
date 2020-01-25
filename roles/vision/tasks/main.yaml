@@ -1,4 +1,5 @@
 - import_tasks: daemon.yaml
+- import_tasks: volume.yaml
 
 - name: Enable IOMMU in Linux command line
   become: yes

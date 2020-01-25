@@ -1,0 +1,2 @@
+# Name of the logical storage pool to use in the vision system
+vision_pool_name: vm
