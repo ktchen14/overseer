@@ -18,17 +18,9 @@
   become: yes
   apt: autoremove=yes
 
-- name: Install neovim
+- name: Install Git, make, and neovim
   become: yes
-  apt: name=neovim
-
-- name: Install Git
-  become: yes
-  apt: name=git
-
-- name: Install make
-  become: yes
-  apt: name=make
+  apt: name=git,make,neovim
 
 - name: Use Terminus font face in Linux console
   become: yes
