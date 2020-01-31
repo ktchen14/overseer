@@ -1,3 +1,7 @@
+- name: Install GnuPG
+  become: yes
+  apt: name=gnupg
+
 - name: Add official PostgreSQL repository signing key
   become: yes
   apt_key: id=ACCC4CF8 url=https://www.postgresql.org/media/keys/ACCC4CF8.asc
