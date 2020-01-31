@@ -30,6 +30,24 @@
   become: yes
   apt: name=make
 
+- name: Use Terminus font face in Linux console
+  become: yes
+  lineinfile:
+    path: /etc/default/console-setup
+    regexp: '^FONTFACE='
+    insertafter: '^CODESET='
+    line: 'FONTFACE="Terminus"'
+  notify: Restart `console-setup` service
+
+- name: Set font size to 28x14 in Linux console
+  become: yes
+  lineinfile:
+    path: /etc/default/console-setup
+    regexp: '^FONTSIZE='
+    insertafter: '^FONTFACE='
+    line: 'FONTSIZE="28x14"'
+  notify: Restart `console-setup` service
+
 - name: Create a user account for each person
   become: yes
   user: name={{ item.username }}
